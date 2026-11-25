@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a1c">
+  <meta name="description" content="Saints of Sant'Anna — prototipo digitale del gioco di carte calcistico">
+  <title>Saints of Sant'Anna · v0.2.1</title>
+  <link rel="stylesheet" href="styles-v0.2.1.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <a class="brand" href="index-v0.2.1.html" aria-label="Saints of Sant'Anna">
+        <span class="brand-crest">S</span>
+        <span><strong>SAINTS</strong><small>OF SANT’ANNA</small></span>
+      </a>
+      <div class="header-meta"><span class="version-pill">PLAYTEST 0.2.1</span><span class="status-led"></span><span>Partita locale</span></div>
+    </header>
+
+    <main>
+      <section id="setup-view" class="setup-view">
+        <div class="eyebrow">PREPARAZIONE DELLA PARTITA</div>
+        <h1>Costruisci la<br><em>formazione.</em></h1>
+        <p class="lead">Scegli quattro giocatori dal tuo mazzo. Un ruolo per ciascuno. Poi il gioco prepara la mano iniziale e porta le squadre sul campo.</p>
+
+        <div class="setup-panel">
+          <div class="setup-panel-head"><div><span class="eyebrow">LA TUA SQUADRA</span><h2>Schieramento iniziale</h2></div><span class="count-badge">4 TITOLARI</span></div>
+          <div id="lineup-selectors" class="lineup-selectors"></div>
+          <div class="legendary-setup">
+            <div><strong>Leggendarie nel mazzo</strong><p>Scegli fino a 3 versioni Leggendarie collegate ai titolari: potrai giocarle con un Rank Up.</p></div>
+            <div id="legendary-options" class="legendary-options"></div>
+          </div>
+          <div class="cpu-preview"><div><span class="eyebrow">AVVERSARIO</span><strong>Computer · formazione automatica</strong><small>Portiere · Difensore · Centrocampista · Attaccante</small></div><span class="cpu-mark">CPU</span></div>
+          <button id="start-game" class="btn btn-primary btn-wide">Conferma formazione e inizia <span>→</span></button>
+          <p class="setup-footnote">Dopo la formazione: 4 carte iniziali per squadra. La partita dura 9 turni, con attacco e difesa alternati.</p>
+        </div>
+      </section>
+
+      <section id="match-view" class="match-view" hidden>
+        <div class="match-heading">
+          <div><span class="eyebrow">SAINTS OF SANT’ANNA · PARTITA</span><h1 id="match-turn-title">Turno 1</h1><p id="match-phase-subtitle">La tua squadra attacca</p></div>
+          <button id="back-to-setup" class="btn btn-outline btn-small">Nuova partita</button>
+        </div>
+        <div class="scoreboard">
+          <div class="score-team mine"><span>LA TUA SQUADRA</span><strong id="human-score">0</strong><small id="human-score-sub">Attacco</small></div>
+          <div class="score-middle"><span>VS</span><small id="turn-count">1 / 9</small></div>
+          <div class="score-team theirs"><span>COMPUTER</span><strong id="cpu-score">0</strong><small id="cpu-score-sub">Difesa</small></div>
+        </div>
+
+        <div id="event-banner" class="event-banner" hidden></div>
+
+        <div class="turn-guide"><span>INIZIO TURNO</span><b id="turn-guide-main">Mano iniziale: 4 carte per squadra · −1 Fatica a tutti i giocatori in campo · +1 a chi è in panchina</b><small id="turn-guide-event">Eventi condivisi nei turni 3, 5, 7 e 9. Break Down: 3 turni completi.</small></div>
+        <nav class="phase-track" aria-label="Fasi del turno">
+          <div class="phase-node" id="phase-upkeep"><span>01</span><b>Pesca e Fatica</b></div>
+          <div class="phase-node" id="phase-actions"><span>02</span><b>Azioni e risposte</b></div>
+          <div class="phase-node" id="phase-showdown"><span>03</span><b>Showdown</b></div>
+          <div class="phase-node" id="phase-shot"><span>04</span><b>Tiro</b></div>
+        </nav>
+
+        <section class="field-section">
+          <div class="section-title"><div><span class="eyebrow">IL CAMPO</span><h2>Le due formazioni</h2></div><span class="field-note">Fatica visibile · passive automatiche</span></div>
+          <div id="field-layout" class="field-layout">
+            <section class="team-panel team-human"><div class="team-panel-head"><div><span class="team-label">LA TUA SQUADRA</span><strong>In campo</strong></div><span class="team-mini-score" id="human-field-score">0 GOL</span></div><div id="human-field" class="unit-grid"></div><div class="reserve-area"><div class="reserve-head"><strong>Panchina</strong><span id="human-bench-count">0 / 5</span></div><div id="human-bench" class="reserve-list"></div><div id="human-breakdown" class="breakdown-list"></div></div></section>
+            <div class="pitch-divider"><span>SAINTS</span><i></i><span>VS</span></div>
+            <section class="team-panel team-cpu"><div class="team-panel-head"><div><span class="team-label">COMPUTER</span><strong>In campo</strong></div><span class="team-mini-score" id="cpu-field-score">0 GOL</span></div><div id="cpu-field" class="unit-grid"></div><div class="reserve-area"><div class="reserve-head"><strong>Panchina</strong><span id="cpu-bench-count">0 / 5</span></div><div id="cpu-bench" class="reserve-list"></div><div id="cpu-breakdown" class="breakdown-list"></div></div></section>
+          </div>
+        </section>
+
+        <section id="action-station" class="action-station">
+          <div class="action-station-head"><div><span class="eyebrow">FASE OPERATIVA</span><h2 id="action-title">Preparati ad attaccare</h2><p id="action-description">Hai 3 Punti Azione. Ogni tua mossa apre una finestra di risposta all'avversario.</p></div><div class="ap-cluster"><div><small>ATTACCO</small><strong id="attack-ap">3</strong><span>PA</span></div><div><small>DIFESA</small><strong id="defense-ap">3</strong><span>PA</span></div></div></div>
+          <div id="response-banner" class="response-banner" hidden></div>
+          <div id="action-content" class="action-content"></div>
+          <div class="action-footer" id="action-footer"></div>
+        </section>
+
+        <section id="showdown-panel" class="showdown-panel" hidden aria-live="polite"></section>
+        <section id="shot-panel" class="shot-panel" hidden aria-live="polite"></section>
+
+        <section class="hand-section">
+          <div class="section-title"><div><span class="eyebrow">CARTE A DISPOSIZIONE</span><h2>La tua mano</h2></div><span class="hand-count" id="hand-count">4 carte</span></div>
+          <div id="hand-grid" class="hand-grid"></div>
+        </section>
+
+        <section class="log-section">
+          <div class="section-title"><div><span class="eyebrow">CRONACA</span><h2>Ultime azioni</h2></div><button id="toggle-log" class="btn btn-outline btn-small">Mostra tutto</button></div>
+          <div id="match-log" class="match-log"></div>
+        </section>
+
+        <div id="next-turn-area" class="next-turn-area" hidden><button id="next-turn" class="btn btn-primary btn-wide">Passa al turno successivo <span>→</span></button></div>
+        <div id="match-result" class="match-result" hidden></div>
+      </section>
+    </main>
+    <footer class="app-footer"><span>SAINTS OF SANT’ANNA</span><span>PROTOTIPO LOCALE · 0.2.1</span></footer>
+  </div>
+
+  <dialog id="action-dialog" class="action-dialog"><form id="action-form" method="dialog"><button type="button" class="dialog-x" id="dialog-x" aria-label="Chiudi">×</button><span class="eyebrow" id="dialog-kicker">AZIONE</span><h2 id="dialog-title">Conferma azione</h2><p id="dialog-copy"></p><div id="dialog-fields" class="dialog-fields"></div><div class="dialog-buttons"><button type="button" id="dialog-cancel" class="btn btn-outline">Annulla</button><button type="submit" class="btn btn-primary">Conferma</button></div></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app-v0.2.1.js"></script>
+</body>
+</html>
